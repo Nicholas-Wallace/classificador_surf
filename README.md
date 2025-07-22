@@ -7,11 +7,10 @@ Esse projeto é um classificador de vídeo, utilizando um modelo de 3D convoluti
 - [Sobre o projeto](##Sobre-o-Projeto)
 - [Arquitetura da Rede](##Arquitetura-de-Rede)
 - [Treinamento](##Treinamento)
- - [Dataset](#Dataset)
- - [Resultados e Metricas](#Resultados-e-Metricas)
+- [Dataset](##Dataset)
+- [Resultados e Metricas](##Resultados-e-Metricas)
 - [Como Baixar](#Como-Baixar)
-- [Proximos Passos](#Proximos-Passos)
-- [Como contribuir](#como-contribuir)
+- [Proximos Passos](#Próximos-Passos)
 - [Licensa](#licensa)
 
 ## Sobre o Projeto
@@ -78,6 +77,131 @@ A matriz de confusão resultante dos videos de teste foi satisfatória e houve u
 
 ![matriz_conf_test](https://github.com/user-attachments/assets/5e84acff-b658-47d7-bee1-aaaa983dfe18 "Matriz de Confusão Teste")
 
+## Como Baixar
+
+Para baixar e rodar o modelo localmene na sua máquina, primeiramente clone o repositório
+
+```bash
+git clone https://github.com/Nicholas-Wallace/classificador_surf
+```
+Em seguida baixe as bibliotecas necessárias
+
+```bash
+pip install -r requirements.txt
+```
+Agora é só executar a aplicação no gradio ou o classificador no console
+
+## Próximos Passos
+
+O projeto é escalável, de forma que o modelo pode ser retreinado com outros datasets, adicionando novas classes e testando novas métricas. Basta baixar o arquivo do notebook classificador_surf.ipynb alterar os caminhos para o dataset
+
+```python
+train_dir = Path('input/surf-dataset-05/surf_dataset_05/train')
+val_dir = Path('input/surf-dataset-05/surf_dataset_05/val')
+test_dir = Path('input/surf-dataset-05/surf_dataset_05/test')
+``
+
+Agora, é importante se atentar as funções e classes já prontas, por exemplo: a classe FrameGenerator é importantíssima para o funcionamento da rede, é ela quem transforma o dataset no formato de input correto
+
+```python
+def format_frames(frame, output_size):
+  """
+    Pad and resize an image from a video.
+
+    Args:
+      frame: Image that needs to resized and padded.
+      output_size: Pixel size of the output frame image.
+
+    Return:
+      Formatted frame with padding of specified output size.
+  """
+  frame = tf.image.convert_image_dtype(frame, tf.float32)
+  frame = tf.image.resize_with_pad(frame, *output_size)
+  return frame
+
+def frames_from_video_file(video_path, n_frames, output_size = (224,224), frame_step = 15):
+  """
+    Creates frames from each video file present for each category.
+
+    Args:
+      video_path: File path to the video.
+      n_frames: Number of frames to be created per video file.
+      output_size: Pixel size of the output frame image.
+
+    Return:
+      An NumPy array of frames in the shape of (n_frames, height, width, channels).
+  """
+  # Read each video frame by frame
+  result = []
+  src = cv2.VideoCapture(str(video_path))
+
+  video_length = src.get(cv2.CAP_PROP_FRAME_COUNT)
+
+  need_length = 1 + (n_frames - 1) * frame_step
+
+  if need_length > video_length:
+    start = 0
+  else:
+    max_start = video_length - need_length
+    start = random.randint(0, max_start + 1)
+
+  src.set(cv2.CAP_PROP_POS_FRAMES, start)
+  # ret is a boolean indicating whether read was successful, frame is the image itself
+  ret, frame = src.read()
+  result.append(format_frames(frame, output_size))
+
+  for _ in range(n_frames - 1):
+    for _ in range(frame_step):
+      ret, frame = src.read()
+    if ret:
+      frame = format_frames(frame, output_size)
+      result.append(frame)
+    else:
+      result.append(np.zeros_like(result[0]))
+  src.release()
+  result = np.array(result)[..., [2, 1, 0]]
+
+  return result
+
+class FrameGenerator:
+  def __init__(self, path, n_frames, training = False):
+    """ Returns a set of frames with their associated label.
+
+      Args:
+        path: Video file paths.
+        n_frames: Number of frames.
+        training: Boolean to determine if training dataset is being created.
+    """
+    self.path = path
+    self.n_frames = n_frames
+    self.training = training
+    self.class_names = sorted(set(p.name for p in self.path.iterdir() if p.is_dir()))
+    self.class_ids_for_name = dict((name, idx) for idx, name in enumerate(self.class_names))
+
+  def get_files_and_class_names(self):
+    video_paths = list(self.path.glob('*/*.avi'))
+    classes = [p.parent.name for p in video_paths]
+    return video_paths, classes
+
+  def __call__(self):
+    video_paths, classes = self.get_files_and_class_names()
+
+    pairs = list(zip(video_paths, classes))
+
+    if self.training:
+      random.shuffle(pairs)
+
+    for path, name in pairs:
+      video_frames = frames_from_video_file(path, self.n_frames)
+      label = self.class_ids_for_name[name] # Encode labels
+      yield video_frames, label
+```
+
+Dessa forma, qualquer alteração nessas funções tem que ser feita com cautela, pois pode gerar problemas no treinamento
+
+Dito isso, os próximos passos para o projeto seriam adicionar uma classe "surfando", que seria quando o surfista não está fazendo nenhuma manobra. Adicionando essa classe, possivelmente facilitará a implementação desse modelo para analisar a onda inteira do surfista, não só uma manobra, mas quebrando o video da onda completa em vários trechos de 10 frames. Esses trechos seriam analisados de forma que o output final seria algo como "rasgada no tempo 0:27".
+
+Outra coisa interessando de trabalhar seria alterando a arquitetura da rede de forma que ela receba os keypoints do surfista, acredito fortemente que isso melhorará o desempenho do classificador.
 
 
 

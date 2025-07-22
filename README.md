@@ -99,7 +99,7 @@ O projeto é escalável, de forma que o modelo pode ser retreinado com outros da
 train_dir = Path('input/surf-dataset-05/surf_dataset_05/train')
 val_dir = Path('input/surf-dataset-05/surf_dataset_05/val')
 test_dir = Path('input/surf-dataset-05/surf_dataset_05/test')
-``
+```
 
 Agora, é importante se atentar as funções e classes já prontas, por exemplo: a classe FrameGenerator é importantíssima para o funcionamento da rede, é ela quem transforma o dataset no formato de input correto
 

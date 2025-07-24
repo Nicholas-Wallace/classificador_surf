@@ -2,7 +2,7 @@
 
 Esse projeto é um classificador de vídeo, utilizando um modelo de 3D convolutional neural network(CNN) feito no tensorflow, ele consegue classificar a manobra feita num vídeo de surf.
 
-## tabela de conteúdo
+## Sumário
 
 - [Sobre o projeto](##Sobre-o-Projeto)
 - [Arquitetura da Rede](##Arquitetura-de-Rede)
@@ -34,7 +34,7 @@ A vantagem disso, segundo o artigo, é a facilidade dos calculos, pois reduz a q
 
 O núcleo do modelo é construído em torno de blocos residuais, implementados pela função add_residual_block. Cada bloco utiliza uma camada principal ResidualMain para realizar convoluções e normalizações, mas sua característica essencial é a conexão residual. Essa conexão soma a entrada do bloco à sua saída, permitindo que o gradiente flua mais facilmente durante o treinamento e ajudando a rede a aprender características mais complexas. Para garantir que essa soma seja possível mesmo quando o número de filtros aumenta entre os blocos, a camada customizada Project é usada para ajustar as dimensões da conexão residual. A arquitetura processa o vídeo de forma progressiva: após a maioria dos blocos residuais, a camada ResizeVideo reduz a altura e a largura dos frames, diminuindo o custo computacional enquanto os blocos aumentam a profundidade das características (o número de filtros). Por fim, após a extração de características, uma camada GlobalAveragePooling3D condensa as informações espaciais e temporais em um único vetor, que é então achatado (Flatten) e passado para a camada Dense final, responsável por gerar a classificação.
 
-<img src="[path/to/your/image.svg](https://github.com/user-attachments/assets/e2c48cf2-2ae6-42df-850a-f6c5a3b1fc83)" alt="Description of SVG" style="width:[200]; height:auto;">
+<img src="https://github.com/user-attachments/assets/e2c48cf2-2ae6-42df-850a-f6c5a3b1fc83" alt="Description of SVG" style="height:100px; width:auto;">
 
 ## Treinamento 
 O processo de treinamento envolveu múltiplas iterações, nas quais ajustamos diversos parâmetros como o número de épocas, a versão do dataset utilizada, as técnicas de pré-processamento e as taxas de aprendizado. Todos esses experimentos foram executados em ambientes de notebook como Google Colab e Kaggle Notebooks. 
@@ -77,6 +77,8 @@ Abaixo podemos ver um exemplo da matriz de confusão do conjunto de treino, é i
 
 ![matriz_conf_train](https://github.com/user-attachments/assets/4f095c7e-f40d-40ee-b992-3c0799386a1d "Matriz de Confusão Treino")
 
+---
+
 A avaliação final do desempenho do modelo foi realizada utilizando o conjunto de teste, e os resultados são visualizados na matriz de confusão apresentada abaixo. Essa matriz é fundamental para entender como o modelo se comporta na prática, detalhando o número de predições corretas e incorretas para cada uma das classes (Aéreos e Rasgadas). Ela nos permite identificar não apenas a acurácia geral, mas também quais tipos de manobras foram mais desafiadoras para o classificador. Dessa forma, foi identificado que alguns aéreos estão sendo confundidos com rasgadas, isso está acontecendo, provavelmente, em alguns aéreos com pouca rotação, ou em que o surfista não saiu muito da água. Esse erro talvez fosse resolvido adicionando os kepoints como entrada no modelo.
 É importante salientar que o conjunto de teste é composto por vídeos inéditos para o model, que não foram utilizadas durante o treinamento. Isso é importante para garantir que o modelo não esteja muito bem treinado apenas para os casos específicos do conjunto de treino
 
@@ -102,7 +104,7 @@ python3 app.py
 
 ## Próximos Passos
 
-O projeto é escalável, de forma que o modelo pode ser retreinado com outros datasets, adicionando novas classes e testando novas métricas. Basta baixar o arquivo do notebook classificador_surf.ipynb alterar os caminhos para o dataset
+O projeto é escalável, de forma que o modelo pode ser retreinado com outros datasets, adicionando novas classes e testando novas métricas. Basta baixar o arquivo do notebook [classificador_surf.ipynb](https://github.com/Nicholas-Wallace/classificador_surf/blob/main/classificador_surf.ipynb) alterar os caminhos para o dataset
 
 ```python
 train_dir = Path('input/surf-dataset-05/surf_dataset_05/train')
@@ -110,7 +112,7 @@ val_dir = Path('input/surf-dataset-05/surf_dataset_05/val')
 test_dir = Path('input/surf-dataset-05/surf_dataset_05/test')
 ```
 
-Agora, é importante se atentar as funções e classes já prontas, por exemplo: a classe FrameGenerator é importantíssima para o funcionamento da rede, é ela quem transforma o dataset no formato de input correto
+Agora, é importante se atentar as funções e classes já prontas, por exemplo: a classe `FrameGenerator` é importantíssima para o funcionamento da rede, é ela quem transforma o dataset no formato de input correto
 
 ```python
 def format_frames(frame, output_size):
@@ -208,15 +210,15 @@ class FrameGenerator:
 
 Dessa forma, qualquer alteração nessas funções tem que ser feita com cautela, pois pode gerar problemas no treinamento
 
-Dito isso, os próximos passos para o projeto seriam adicionar uma classe "surfando", que seria quando o surfista não está fazendo nenhuma manobra. Adicionando essa classe, possivelmente facilitará a implementação desse modelo para analisar a onda inteira do surfista, não só uma manobra, mas quebrando o video da onda completa em vários trechos de 10 frames. Esses trechos seriam analisados de forma que o output final seria algo como "rasgada no tempo 0:27".
+Dito isso, os próximos passos para o projeto seriam adicionar uma classe `surfando`, que seria quando o surfista não está fazendo nenhuma manobra. Adicionando essa classe, possivelmente facilitará a implementação desse modelo para analisar a onda inteira do surfista, não só uma manobra, mas quebrando o video da onda completa em vários trechos de 10 frames. Esses trechos seriam analisados de forma que o output final seria algo como `rasgada no tempo 0:27`.
 
-Outra coisa interessando de trabalhar seria alterando a arquitetura da rede de forma que ela receba os keypoints do surfista, acredito fortemente que isso melhorará o desempenho do classificador.
+Outra coisa interessando de trabalhar seria alterando a arquitetura da rede de forma que ela receba os `keypoints` do surfista, acredito fortemente que isso melhorará o desempenho do classificador.
 
 ![keypoints](https://github.com/user-attachments/assets/6534acec-8176-4997-a275-335293eb7814)
 
 ## Licença
 
-O calssificador de manobras de surf é licenciado sob a licença MIT, que pode ser encontrada no arquivo __LICENSE__
+O calssificador de manobras de surf é licenciado sob a licença MIT, que pode ser encontrada no arquivo [LICENSE](https://github.com/Nicholas-Wallace/classificador_surf/blob/main/LICENSE.txt)
 
 
 

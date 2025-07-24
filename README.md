@@ -40,6 +40,18 @@ O núcleo do modelo é construído em torno de blocos residuais, implementados p
 O processo de treinamento envolveu múltiplas iterações, nas quais ajustamos diversos parâmetros como o número de épocas, a versão do dataset utilizada, as técnicas de pré-processamento e as taxas de aprendizado. Todos esses experimentos foram executados em ambientes de notebook como Google Colab e Kaggle Notebooks. 
 
 ### Dataset
+```text
+surf_dataset
+├── test
+│   ├── aerial
+│   └── rasgada
+├── train
+│   ├── aerial
+│   └── rasgada
+└── val
+    ├── aerial
+    └── rasgada
+```
 
 Essa foi sem dúvida a parte mais trabalhosa do projeto, criar um dataset do zero não é facil! Utilizamos recortes de +/- 3 segundos (tempo médio de uma manobra), a maioria de surfistas profissionais perfomando nas competições mais importantes da cena do surf mundial. Foi utilizada a ferramenta [ffmpeg](https://ffmpeg.org/), tanto para ajustar o formato ideal do vídeo, tanto para o cortes. Existe também uma GUI feita com base em ffmpeg que ajudou bastante chamada [lossless cut](https://github.com/mifi/lossless-cut), ela mantém o formato do vídeo e ajuda a ter uma precisão maior no corte.
 

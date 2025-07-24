@@ -11,7 +11,7 @@ Esse projeto é um classificador de vídeo, utilizando um modelo de 3D convoluti
 - [Resultados e Metricas](##Resultados-e-Metricas)
 - [Como Baixar](#Como-Baixar)
 - [Proximos Passos](#Próximos-Passos)
-- [Licensa](#licensa)
+- [Licença](#Licença)
 
 ## Sobre o Projeto
 
@@ -21,7 +21,7 @@ Foi decidido o nicho do esporte, visto que a analise de vídeo hoje está muito 
 
 Além disso o projeto é escalável e pretendemos fornecer análises cada vez mais detalhadas dos vídeos.
 
-[foto que representa o projeto]
+<img width="1878" height="654" alt="representa_projeto" src="https://github.com/user-attachments/assets/84a163fe-0f7d-4323-af1a-aa9d0dcbd914" />
 
 ## Arquitetura da rede
 Nesse tutorial é utilizada uma camada de Convolução 3D, que na realidade é (2+1)D, técnica detalhada no artigo [A Closer Look at Spatiotemporal Convolutions for Action Recognition](https://arxiv.org/abs/1711.11248v3) de D. Tran et al. (2017). Como estamos lidando com vídeos, essa primeira camada recebe entradas com tempo * altura * largura * canais), no caso dos videos do dataset recebe arrays com (numero de frames, altura do vídeo, largura do vídeo, red, green, blue).
@@ -67,15 +67,20 @@ exemplo de video segmentado
 ![cropped_01](https://github.com/user-attachments/assets/08117358-8627-4635-be1d-ff24ab5a6b9d)
 
 ## Resultados e Metricas
-Após diversas rodadas de testes e treinamentos, alcançamos resultados satisfatórios nas métricas escolhidas. Durante o processo, acompanhamos de perto a acurácia e a loss tanto do conjunto de treinamento quanto do conjunto de validação, culminando em um desempenho final robusto.
+### Acuraccy e Loss
+Após diversas rodadas de testes e treinamentos, alcançamos resultados satisfatórios nas métricas escolhidas. Durante o processo, acompanhamos de perto a ´acurácia´ e a ´loss´ tanto do conjunto de treinamento quanto do conjunto de validação, culminando em um desempenho final robusto.
 
-<img width="1364" height="772" alt="Screenshot from 2025-07-21 14-31-47" src="https://github.com/user-attachments/assets/507238e8-0659-4650-ab16-b68c25bbb843" />
+<img width="1364" height="772" alt="Screenshot from 2025-07-21 14-31-47" src="https://github.com/user-attachments/assets/507238e8-0659-4650-ab16-b68c25bbb843" >
 
-A matriz de confusão resultante dos videos de teste foi satisfatória e houve uma mudança significativa em relação a matriz gerada com os arquivos de treino. Entretanto alguns aéreos estão sendo confundidos com rasgadas, isso está acontecendo, provavelmente, em alguns aéreos com pouca rotação, ou em que o surfista não saiu muito da água. Esse erro talvez fosse resolvido adicionando os kepoints como entrada no modelo.
+### Matriz de confusão
+Abaixo podemos ver um exemplo da matriz de confusão do conjunto de treino, é interessante ver esse resultado para entender como o modelo foi se comportando durante o treinamento
 
 ![matriz_conf_train](https://github.com/user-attachments/assets/4f095c7e-f40d-40ee-b992-3c0799386a1d "Matriz de Confusão Treino")
 
-![matriz_conf_test](https://github.com/user-attachments/assets/5e84acff-b658-47d7-bee1-aaaa983dfe18 "Matriz de Confusão Teste")
+A avaliação final do desempenho do modelo foi realizada utilizando o conjunto de teste, e os resultados são visualizados na matriz de confusão apresentada abaixo. Essa matriz é fundamental para entender como o modelo se comporta na prática, detalhando o número de predições corretas e incorretas para cada uma das classes (Aéreos e Rasgadas). Ela nos permite identificar não apenas a acurácia geral, mas também quais tipos de manobras foram mais desafiadoras para o classificador. Dessa forma, foi identificado que alguns aéreos estão sendo confundidos com rasgadas, isso está acontecendo, provavelmente, em alguns aéreos com pouca rotação, ou em que o surfista não saiu muito da água. Esse erro talvez fosse resolvido adicionando os kepoints como entrada no modelo.
+É importante salientar que o conjunto de teste é composto por vídeos inéditos para o model, que não foram utilizadas durante o treinamento. Isso é importante para garantir que o modelo não esteja muito bem treinado apenas para os casos específicos do conjunto de treino
+
+![matriz_conf_test](https://github.com/user-attachments/assets/5e84acff-b658-47d7-bee1-aaaa983dfe18 "Matriz de Confusão Teste") 
 
 ## Como Baixar
 
@@ -90,6 +95,10 @@ Em seguida baixe as bibliotecas necessárias
 pip install -r requirements.txt
 ```
 Agora é só executar a aplicação no gradio ou o classificador no console
+
+```bash
+python3 app.py
+```
 
 ## Próximos Passos
 
@@ -202,6 +211,13 @@ Dessa forma, qualquer alteração nessas funções tem que ser feita com cautela
 Dito isso, os próximos passos para o projeto seriam adicionar uma classe "surfando", que seria quando o surfista não está fazendo nenhuma manobra. Adicionando essa classe, possivelmente facilitará a implementação desse modelo para analisar a onda inteira do surfista, não só uma manobra, mas quebrando o video da onda completa em vários trechos de 10 frames. Esses trechos seriam analisados de forma que o output final seria algo como "rasgada no tempo 0:27".
 
 Outra coisa interessando de trabalhar seria alterando a arquitetura da rede de forma que ela receba os keypoints do surfista, acredito fortemente que isso melhorará o desempenho do classificador.
+
+![keypoints](https://github.com/user-attachments/assets/6534acec-8176-4997-a275-335293eb7814)
+
+## Licença
+
+O calssificador de manobras de surf é licenciado sob a licença MIT, que pode ser encontrada no arquivo __LICENSE__
+
 
 
 
